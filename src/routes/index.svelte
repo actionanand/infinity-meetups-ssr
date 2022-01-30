@@ -1,3 +1,32 @@
+<script context="module">
+  export function preload(page) {
+    // console.log(page);
+    return this.fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/meetups.json').then(res => {
+      if(!res.ok) {
+        throw new Error('Error fetching meetup data');
+      }
+      return res.json();
+    }).then(data => {
+      const loadedMeetups = [];
+      for (const key in data) {
+        loadedMeetups.push({
+          ...data[key],
+          id: key
+        });
+      }
+      // isError = null;
+      // isLoading = false;
+      return {fetchedMeetups: loadedMeetups};
+      // meetups.setMeetups(loadedMeetups.reverse());
+    }).catch(err => {
+      // isError = err;
+      // isLoading = false;
+      this.error(500, 'Could not fetch meetups');
+      // console.log(err.message);
+    });
+  }
+</script>
+
 <script>
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { scale } from 'svelte/transition';
@@ -11,7 +40,7 @@
   import EditMeetup from '../components/Meetup/EditMeetup.svelte';
   import LoadingSpinner from '../components/UI/LoadingSpinner.svelte';
 
-  let fetchedMeetups = [];
+  export let fetchedMeetups;
 
   const dispatch = createEventDispatcher();
 
@@ -19,39 +48,10 @@
   let editMode;
   let editedId = null;
   let isLoading = false;
-  let isError = false;
-  let unsubscribe;
+  // let isError = false;
 
   onMount(() => {
-    unsubscribe = meetups.subscribe(items => fetchedMeetups = items);
-    isLoading = true;
-    fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/meetups.json').then(res => {
-      if(!res.ok) {
-        throw new Error('Error fetching meetup data');
-      }
-      return res.json();
-    }).then(data => {
-      const loadedMeetups = [];
-      for (const key in data) {
-        loadedMeetups.push({
-          ...data[key],
-          id: key
-        });
-      }
-      isError = null;
-      isLoading = false;
-      meetups.setMeetups(loadedMeetups.reverse());
-    }).catch(err => {
-      isError = err;
-      isLoading = false;
-      // console.log(err.message);
-    });
-  });
-
-  onDestroy(() => {
-    if(unsubscribe) {
-      unsubscribe();
-    }
+    meetups.setMeetups(fetchedMeetups);
   });
 
   $: filteredMeetups = favsOnly ? fetchedMeetups.filter(m => m.isFavorite) : fetchedMeetups;
