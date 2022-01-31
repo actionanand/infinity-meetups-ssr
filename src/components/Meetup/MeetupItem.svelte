@@ -71,12 +71,12 @@
     font-family: "Roboto Slab", sans-serif;
   }
 
-  h1.is-favorite {
+  /* h1.is-favorite {
     background: #01a129;
     color: white;
     padding: 0 0.5rem;
     border-radius: 5px;
-  }
+  } */
 
   h2 {
     font-size: 1rem;
@@ -136,6 +136,6 @@
         {isFav? 'Unfavorite' : 'Favorite'}
       </Button>
     {/if}
-    <Button type="button" on:click="{() => dispatch('show-details', id)}">Show Details</Button>
+    <Button href="/{id}" >Show Details</Button>
   </footer>
 </article>

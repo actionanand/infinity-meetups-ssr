@@ -1,7 +1,7 @@
 <script>
   import Header from '../components/UI/Header.svelte';
 
-	export let segment;
+	// export let segment;
 
   let appName = 'infinity meetups';
 </script>

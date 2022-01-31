@@ -14,15 +14,9 @@
           id: key
         });
       }
-      // isError = null;
-      // isLoading = false;
       return {fetchedMeetups: loadedMeetups.reverse()};
-      // meetups.setMeetups(loadedMeetups.reverse());
     }).catch(err => {
-      // isError = err;
-      // isLoading = false;
-      this.error(500, 'Could not fetch meetups');
-      // console.log(err.message);
+      this.error(500, 'Could not fetch meetups : ', err.message);
     });
   }
 </script>
@@ -42,7 +36,6 @@
 
   export let fetchedMeetups;
 
-  const dispatch = createEventDispatcher();
 
   let loadedMeetups = [];
   let favsOnly = false;
@@ -50,12 +43,13 @@
   let editedId = null;
   let isLoading = false;
   let unsubscribe;
-  // let isError = false;
 
   onMount(() => {
+    isLoading = true;
     unsubscribe = meetups.subscribe(items => {
       loadedMeetups = items;
     });
+    isLoading = false;
     meetups.setMeetups(fetchedMeetups);
   });
 
@@ -150,4 +144,3 @@
     {/each}
   </section>
 {/if}
-
