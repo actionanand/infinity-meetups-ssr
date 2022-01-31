@@ -1,0 +1,22 @@
+{
+  "bundler": "rollup",
+  "shimport": "1.0.1",
+  "assets": {
+    "main": "client.f9df6ebb.js"
+  },
+  "css": {
+    "main": "main.2908569843.css",
+    "chunks": {
+      "index.svelte": [
+        "index.7e79f09f.css",
+        "client.f9df6ebb.css",
+        "Button.cac47677.css"
+      ],
+      "MeetupDetail.svelte": [
+        "MeetupDetail.4595b000.css",
+        "client.f9df6ebb.css",
+        "Button.cac47677.css"
+      ]
+    }
+  }
+}
