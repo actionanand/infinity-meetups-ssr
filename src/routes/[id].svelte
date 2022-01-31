@@ -1,22 +1,26 @@
-<script>
-  import { onDestroy, createEventDispatcher } from 'svelte';
+<script context="module">
+  export function preload(page) {
+    const meetupId = page.params.id;
 
-  import meetups from '../store/meetups-store.js';
-  
+    return this.fetch(`https://vue-http-exmp-default-rtdb.firebaseio.com/meetups/${meetupId}.json`)
+    .then(res => {
+      if(!res.ok) {
+        throw new Error(`Error fetching meetup with id ${meetupId}`);
+      }
+      return res.json();
+    }).then(data => {
+      return {selectedMeetup: {...data, id: meetupId}};
+      // meetups.setMeetups(loadedMeetups.reverse());
+    }).catch(err => {
+      this.error(404, 'Could not fetch meetups');
+    });
+  }
+</script>
+
+<script>
   import Button from '../components/UI/Button.svelte'
 
-  export let id;
-
-  let selectedMeetup;
-  const dispatch = createEventDispatcher();
-
-  const unSub = meetups.subscribe(items => {
-    selectedMeetup = items.find(item => item.id === id);
-  });
-
-  onDestroy(() => {
-    unSub();
-  });
+  export let selectedMeetup;
 </script>
 
 <section>
@@ -28,7 +32,7 @@
     <h2>{selectedMeetup.subtitle} - {selectedMeetup.address}</h2>
     <p>{selectedMeetup.description}</p>
     <Button href="mailto:{selectedMeetup.contactEmail}">Contact</Button>
-    <Button type="button" mode="outline" on:click="{() => dispatch('close-details')}">Close</Button>
+    <Button href="/" mode="outline">Close</Button>
   </div>
 </section>
 

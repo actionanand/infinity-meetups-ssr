@@ -14,15 +14,9 @@
           id: key
         });
       }
-      // isError = null;
-      // isLoading = false;
-      return {fetchedMeetups: loadedMeetups};
-      // meetups.setMeetups(loadedMeetups.reverse());
+      return {fetchedMeetups: loadedMeetups.reverse()};
     }).catch(err => {
-      // isError = err;
-      // isLoading = false;
-      this.error(500, 'Could not fetch meetups');
-      // console.log(err.message);
+      this.error(500, 'Could not fetch meetups : ', err.message);
     });
   }
 </script>
@@ -42,19 +36,30 @@
 
   export let fetchedMeetups;
 
-  const dispatch = createEventDispatcher();
 
+  let loadedMeetups = [];
   let favsOnly = false;
   let editMode;
   let editedId = null;
   let isLoading = false;
-  // let isError = false;
+  let unsubscribe;
 
   onMount(() => {
+    isLoading = true;
+    unsubscribe = meetups.subscribe(items => {
+      loadedMeetups = items;
+    });
+    isLoading = false;
     meetups.setMeetups(fetchedMeetups);
   });
 
-  $: filteredMeetups = favsOnly ? fetchedMeetups.filter(m => m.isFavorite) : fetchedMeetups;
+  onDestroy(() => {
+    if(unsubscribe) {
+      unsubscribe();
+    }
+  });
+
+  $: filteredMeetups = favsOnly ? loadedMeetups.filter(m => m.isFavorite) : loadedMeetups;
 
   function selectComponent(event) {
     favsOnly = event.detail === 'fav-meetup';
@@ -73,6 +78,10 @@
   function onEditMeetup(event) {
     editMode = 'edit';
     editedId = event.detail;
+  }
+
+  function onAddMeetup() {
+    editMode = 'edit';
   }
 
   function onErrorEditPage(event) {
@@ -120,7 +129,7 @@
 {:else}
   <section id="meetup-controls">
     <MeetupFilter on:select-component="{selectComponent}" />
-    <Button on:click="{() => dispatch('add-meetup')}">New Meetup</Button>
+    <Button on:click="{onAddMeetup}">New Meetup</Button>
   </section>
 {#if filteredMeetups.length === 0}
   <p id="no-meetups">No meetups found!, Please add some.</p>
@@ -130,9 +139,8 @@
       <div transition:scale animate:flip="{{duration: 700}}">
         <MeetupItem title={meetup.title} subtitle={meetup.subtitle} description={meetup.description}
         imageUrl={meetup.imageUrl} address={meetup.address} email={meetup.contactEmail} 
-        id={meetup.id} isFav={meetup.isFavorite} on:show-details on:edit-meetup/>
+        id={meetup.id} isFav={meetup.isFavorite} on:edit-meetup="{onEditMeetup}"/>
       </div>
     {/each}
   </section>
 {/if}
-
